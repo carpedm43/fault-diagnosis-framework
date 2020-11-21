@@ -13,7 +13,16 @@ setup(
     packages=find_packages(),
     package_data={
         "shrm": [
-            "data/*"
+            "data/B_7/*.mat",
+            "data/B_14/*.mat",
+            "data/B_21/*.mat",
+            "data/I_7/*.mat",
+            "data/I_14/*.mat",
+            "data/I_21/*.mat",
+            "data/O_7/*.mat",
+            "data/O_14/*.mat",
+            "data/O_21/*.mat",
+            "data/N_0/*.mat"
         ]
     },
     zip_safe=False,
