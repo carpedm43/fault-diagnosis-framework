@@ -1,14 +1,15 @@
+import os
 import torch
 from scipy.io import loadmat
-from pathlib import Path
 
 
 class CWRUDataset:
-    DATASET_PATH = Path('.') / 'shrm' / 'data'
+    PATH = os.path.dirname(os.path.abspath(__file__))
+    DATASET_PATH = os.path.join(PATH, 'data')
     LOADS = [0, 1, 2, 3]
     LABELS = ['N_0', 'I_7', 'I_14', 'I_21', 'B_7', 'B_14', 'B_21', 'O_7', 'O_14', 'O_21']
     SAMPLING_RATE = 12000
-    MAX_LENGTH = 121410
+    MAX_LENGTH = 121265
 
     def __init__(self, loads=LOADS, labels=LABELS,
                  split_constant_length=MAX_LENGTH):
@@ -18,8 +19,6 @@ class CWRUDataset:
         self.label_to_int = dict(sorted(zip(self.labels, range(len(self.labels)))))
         self.int_to_label = {ints: label for label, ints in zip(self.label_to_int.keys(), self.label_to_int.values())}
         self.X, self.y = self._get_dataset_from_data_path()
-        self.input_shape = self.X.shape[1:]
-        self.output_shape = len(set(list(self.y)))
 
     @property
     def loads(self):
@@ -65,16 +64,14 @@ class CWRUDataset:
     def _get_dataset_from_data_path(self):
         X = []
         y = []
+        LABEL_PATH = [i for i in os.listdir(CWRUDataset.DATASET_PATH) if i in CWRUDataset.LABELS]
 
-        for label_dir in [i for i in CWRUDataset.DATASET_PATH.iterdir() if i.name in CWRUDataset.LABELS]:
-            for load, load_dir in enumerate(
-                    sorted([j for j in label_dir.iterdir() if j.name.endswith('.mat') == True])):
-                label = label_dir.name
-                load_file_name = load_dir.name.split('.')[0]
+        for label in LABEL_PATH:
+            for load, load_file_name in enumerate(sorted(
+                    [j for j in os.listdir(os.path.join(CWRUDataset.DATASET_PATH, label)) if j.endswith('.mat') == True])):
                 if load in self.loads:
-                    KEY = 'X' + load_file_name + '_DE_time'  # (TODO) DE_time으로 하는게 맞는지
-                    signal_channel = loadmat(load_dir)[KEY].T  # shape (1, length)
-
+                    KEY = 'X' + load_file_name.split('.')[0] + '_DE_time'  # (TODO) DE_time으로 하는게 맞는지
+                    signal_channel = loadmat(os.path.join(CWRUDataset.DATASET_PATH, label, load_file_name))[KEY].T  # shape (1, length)
                     X.append(signal_channel[:, :self.length])
                     y.append(self.label_to_int[label])
 
