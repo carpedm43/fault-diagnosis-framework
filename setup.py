@@ -11,6 +11,9 @@ setup(
     python_requires = '>=3',
     packages=[],
     package_data={
+        "shrm": [
+            "data/*"
+        ]
     },
     zip_safe=False,
 
