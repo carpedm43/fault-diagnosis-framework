@@ -16,7 +16,6 @@ class CWRUDataset:
         self.__loads = loads
         self.__length = split_constant_length
         self.label_to_int = dict(sorted(zip(self.labels, range(len(self.labels)))))
-        self.split_constant_length = split_constant_length
         self.int_to_label = {ints: label for label, ints in zip(self.label_to_int.keys(), self.label_to_int.values())}
         self.X, self.y = self._get_dataset_from_data_path()
         self.input_shape = self.X.shape[1:]
@@ -76,7 +75,7 @@ class CWRUDataset:
                     KEY = 'X' + load_file_name + '_DE_time'  # (TODO) DE_time으로 하는게 맞는지
                     signal_channel = loadmat(load_dir)[KEY].T  # shape (1, length)
 
-                    X.append(signal_channel[:, :self.split_constant_length])
+                    X.append(signal_channel[:, :self.length])
                     y.append(self.label_to_int[label])
 
         X = torch.Tensor(X)
