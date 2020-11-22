@@ -1,6 +1,42 @@
 import os
 import torch
 from scipy.io import loadmat
+import requests
+import tarfile
+
+
+def download_file_from_google_drive(id, destination):
+    URL = "https://docs.google.com/uc?export=download"
+
+    session = requests.Session()
+
+    response = session.get(URL, params={'id': id}, stream=True)
+    token = get_confirm_token(response)
+
+    if token:
+        params = {'id': id, 'confirm': token}
+        response = session.get(URL, params=params, stream=True)
+
+    save_response_content(response, destination)
+
+
+def get_confirm_token(response):
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
+
+    return None
+
+
+def save_response_content(response, destination):
+    CHUNK_SIZE = 32768
+
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(CHUNK_SIZE):
+            if chunk:  # filter out keep-alive new chunks
+                f.write(chunk)
+
+        print('Download CWRU Dataset successfully')
 
 
 class CWRUDataset:
@@ -66,12 +102,26 @@ class CWRUDataset:
         y = []
         LABEL_PATH = [i for i in os.listdir(CWRUDataset.DATASET_PATH) if i in CWRUDataset.LABELS]
 
+        shrm_dir = os.path.join(os.path.expanduser("~"), '.shrm')
+        os.makedirs(shrm_dir, exist_ok=True)
+        shrm_file = os.path.join(shrm_dir,'cwru.tar.gz')
+
+
+        file_id = 'https://drive.google.com/file/d/105IThQbioVIvVpH45udX4wHKXeixHbyn/view?usp=sharing'
+        download_file_from_google_drive(file_id, shrm_file)
+
+        tar = tarfile.open(shrm_file)
+        tar.extractall()
+        tar.close()
+
         for label in LABEL_PATH:
             for load, load_file_name in enumerate(sorted(
-                    [j for j in os.listdir(os.path.join(CWRUDataset.DATASET_PATH, label)) if j.endswith('.mat') == True])):
+                    [j for j in os.listdir(os.path.join(CWRUDataset.DATASET_PATH, label)) if
+                     j.endswith('.mat') == True])):
                 if load in self.loads:
                     KEY = 'X' + load_file_name.split('.')[0] + '_DE_time'  # (TODO) DE_time으로 하는게 맞는지
-                    signal_channel = loadmat(os.path.join(CWRUDataset.DATASET_PATH, label, load_file_name))[KEY].T  # shape (1, length)
+                    signal_channel = loadmat(os.path.join(CWRUDataset.DATASET_PATH, label, load_file_name))[
+                        KEY].T  # shape (1, length)
                     X.append(signal_channel[:, :self.length])
                     y.append(self.label_to_int[label])
 
