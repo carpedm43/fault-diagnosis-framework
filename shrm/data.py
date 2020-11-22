@@ -1,6 +1,7 @@
 import os
 import torch
 from scipy.io import loadmat
+import tarfile
 
 
 class CWRUDataset:
@@ -65,6 +66,10 @@ class CWRUDataset:
         X = []
         y = []
         LABEL_PATH = [i for i in os.listdir(CWRUDataset.DATASET_PATH) if i in CWRUDataset.LABELS]
+
+        tar = tarfile.open(os.path.join(CWRUDataset.DATASET_PATH, 'cwru.tar.gz'))
+        tar.extractall(CWRUDataset.DATASET_PATH)
+        tar.close()
 
         for label in LABEL_PATH:
             for load, load_file_name in enumerate(sorted(
