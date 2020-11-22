@@ -74,15 +74,15 @@ class CWRUDataset:
         #
         # file_id = 'https://drive.google.com/file/d/105IThQbioVIvVpH45udX4wHKXeixHbyn/view?usp=sharing'
         # download_file_from_google_drive(file_id, shrm_file)
-
-        tar = tarfile.open(os.path.join(CWRUDataset.DATASET_PATH, 'cwru.tar.gz'))
-        tar.extractall(CWRUDataset.DATASET_PATH)
-        tar.close()
+        #
+        # tar = tarfile.open(os.path.join(CWRUDataset.DATASET_PATH, 'cwru.tar.gz'))
+        # tar.extractall(CWRUDataset.DATASET_PATH)
+        # tar.close()
 
         for label in LABEL_PATH:
             for load, load_file_name in enumerate(sorted(
                     [j for j in os.listdir(os.path.join(CWRUDataset.DATASET_PATH, label)) if
-                     j.endswith('.mat') == True])):
+                     (j.endswith('.mat') == True and j.startswith('.') == False)])):
                 if load in self.loads:
                     KEY = 'X' + load_file_name.split('.')[0] + '_DE_time'  # (TODO) DE_time으로 하는게 맞는지
                     signal_channel = loadmat(os.path.join(CWRUDataset.DATASET_PATH, label, load_file_name))[

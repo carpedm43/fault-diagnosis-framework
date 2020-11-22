@@ -13,7 +13,7 @@ setup(
     packages=find_packages(),
     package_data={
         "shrm": [
-            'data/cwru.tar.gz'
+            'data/*'
         ]
     },
     zip_safe=False,
