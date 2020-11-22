@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name="shrm",
-    version="0.1.1",
+    version="0.1.2",
     description='shrm',
     url='https://github.com/carpedm43/shrm.git',
     author='hyeonbaekong',
