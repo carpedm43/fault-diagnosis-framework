@@ -1,7 +1,6 @@
 import os
 import torch
 from scipy.io import loadmat
-import tarfile
 
 
 class CWRUDataset:
@@ -66,18 +65,6 @@ class CWRUDataset:
         X = []
         y = []
         LABEL_PATH = [i for i in os.listdir(CWRUDataset.DATASET_PATH) if i in CWRUDataset.LABELS]
-
-        # shrm_dir = os.path.join(os.path.expanduser("~"), '.shrm')
-        # os.makedirs(shrm_dir, exist_ok=True)
-        # shrm_file = os.path.join(shrm_dir,'cwru.tar.gz')
-        #
-        #
-        # file_id = 'https://drive.google.com/file/d/105IThQbioVIvVpH45udX4wHKXeixHbyn/view?usp=sharing'
-        # download_file_from_google_drive(file_id, shrm_file)
-        #
-        # tar = tarfile.open(os.path.join(CWRUDataset.DATASET_PATH, 'cwru.tar.gz'))
-        # tar.extractall(CWRUDataset.DATASET_PATH)
-        # tar.close()
 
         for label in LABEL_PATH:
             for load, load_file_name in enumerate(sorted(
